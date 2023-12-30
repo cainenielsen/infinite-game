@@ -1,0 +1,14 @@
+html {
+  background-color: black;
+}
+
+body {
+  margin: 0;
+  background-color: green;
+}
+
+.display {
+  /* prevent weird body overflow */
+  display: block;
+  box-shadow: 0 0 0 1px blue inset;
+}
