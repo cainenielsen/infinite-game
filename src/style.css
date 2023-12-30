@@ -3,12 +3,14 @@ html {
 }
 
 body {
+  /* remove default margin */
   margin: 0;
   background-color: green;
 }
 
-.display {
+canvas {
   /* prevent weird body overflow */
   display: block;
+  /* good for debugging */
   box-shadow: 0 0 0 1px blue inset;
 }
