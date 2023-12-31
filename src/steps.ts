@@ -1,3 +1,5 @@
+import { tileSize } from './main'
+
 export const setupDisplay = () => {
   // create a new canvas element
   const displayCanvas = document.createElement('canvas')
@@ -49,7 +51,15 @@ export const loadPlayerData = (gameId: number, playerId: number) => {
     localStorage.setItem(`game#${gameId}#player#${playerId}`, JSON.stringify({
       location: {
         x: 0,
+        y: -1
+      },
+      velocity: {
+        x: 0,
         y: 0
+      },
+      movement: {
+        left: false,
+        right: false
       }
     }));
 
