@@ -38,7 +38,7 @@ export default class Game {
   }
   createSettingsData() {
     const newSettingsData: SettingsData = {
-      tileSize: 24,
+      tileSize: 4,
       renderDistance: 3
     }
     localStorage.setItem('game#settings', JSON.stringify(newSettingsData))

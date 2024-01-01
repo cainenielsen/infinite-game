@@ -30,7 +30,7 @@ const rightHandler = {
     player.toggleRight(true)
   },
   keyup: (player: Player) => {
-    player.toggleLeft(false)
+    player.toggleRight(false)
   }
 }
 

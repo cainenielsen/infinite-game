@@ -22,7 +22,7 @@ export default class Animator {
     this.elapsed = undefined
     this.sinceStart = undefined
     this.currentFps = undefined
-    this.fps = 1
+    this.fps = 60
 
     requestAnimationFrame((timestamp) => {
       this.step(timestamp)

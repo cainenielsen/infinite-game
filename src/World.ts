@@ -52,6 +52,8 @@ export default class World {
       this.chunkMedia.forEach((chunkMedia, chunkMediaKey) => this.cleanChunkMedia(chunkMedia, chunkMediaKey))
       this.chunkMedia.forEach((chunkMedia, chunkMediaKey) => this.displayChunk(chunkMedia, chunkMediaKey))
     })
+
+    this.player.animate()
   }
   setDefaultData() {
     const newWorldData: WorldData = {
@@ -158,8 +160,8 @@ export default class World {
     const chunkCanvas = new OffscreenCanvas(this.chunkCanvasSize, this.chunkCanvasSize)
     const chunkContext = chunkCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D
 
-    chunkContext.fillStyle = 'yellow'
-    chunkContext.fillRect(0, 0, this.chunkCanvasSize, this.chunkCanvasSize)
+    // chunkContext.fillStyle = 'yellow'
+    // chunkContext.fillRect(0, 0, this.chunkCanvasSize, this.chunkCanvasSize)
 
     if (chunk.y >= 0) {
       chunkContext.fillStyle = '#784212' // brown

@@ -31,7 +31,8 @@ export default class Player {
     this.id = playerId
     this.data = this.loadPlayerData()
     this.controller = new Controller(this)
-
+  }
+  animate(): void {
     this.world.game.animator.drawStack.push(() => {
       this.handleMovement()
       this.handleGravity()
@@ -90,7 +91,7 @@ export default class Player {
   }
   handleMovement() {
     if (this.data.movement.jump) {
-      if (this.data.location.y === 0 - this.world.game.settings.tileSize) {
+      if (this.data.location.y === -1) {
         this.data.location.y -= 0.01
         this.data.velocity.y = -0.75
       }
@@ -148,22 +149,21 @@ export default class Player {
   drawPlayer() {
     this.display.context.fillStyle = 'green'
 
-    console.info('drawed player', this.visualAddress)
-
     this.display.context.fillRect(
       this.visualAddress.x,
       this.visualAddress.y,
       this.tileSize,
       this.tileSize
     )
+
+    this.display.context.fillStyle = 'black'
+    this.display.context.fillText(JSON.stringify(this.data), this.data.location.x * this.tileSize, this.data.location.y * this.tileSize)
   }
   handleCamera() {
     this.display.transform({
       x: -this.visualAddress.x + (this.display.canvas.width * 0.5) - (this.tileSize * 0.5),
       y: -this.visualAddress.y + (this.display.canvas.height * 0.5) - (this.tileSize * 0.5)
     })
-
-    console.info('camera address', this.cameraVisualAddress)
 
     this.display.clearPoint = this.cameraVisualAddress
   }

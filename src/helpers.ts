@@ -15,6 +15,4 @@ export const max = (val: number, maxVal: number) => {
   } else return maxVal
 }
 
-export const defaultCanvasMatrixValues = [1, 0, 0, 1, 0, 0];
-
-export const defaultCanvasMatrix = new DOMMatrix(defaultCanvasMatrixValues);
+export const defaultCanvasMatrixValues = [1, 0, 0, 1, 0, 0] as [number, number, number, number, number, number];
