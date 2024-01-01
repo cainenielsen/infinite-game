@@ -22,7 +22,7 @@ export default class Game {
     this.display = new Display(this)
     this.worlds = {}
     this.playerId = playerId
-    this.chunkSize = 48
+    this.chunkSize = 24
     this.settings = this.loadSettingsData()
     this.loadWorlds()
 

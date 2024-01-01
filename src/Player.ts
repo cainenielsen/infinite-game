@@ -142,8 +142,8 @@ export default class Player {
   }
   get cameraVisualAddress(): Point {
     return {
-      x: this.visualAddress.x - this.display.canvas.width * 0.5,
-      y: this.visualAddress.y - this.display.canvas.height * 0.5
+      x: this.visualAddress.x - this.display.canvas.width * 0.5 + this.tileSize * 0.5,
+      y: this.visualAddress.y - this.display.canvas.height * 0.5 + this.tileSize * 0.5
     }
   }
   drawPlayer() {
