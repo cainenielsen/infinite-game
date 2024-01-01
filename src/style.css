@@ -1,16 +1,17 @@
 html {
-  background-color: black;
+  background-color: silver;
 }
 
 body {
   /* remove default margin */
   margin: 0;
-  background-color: green;
+  background-color: white;
 }
 
 canvas {
+  background-color: black;
   /* prevent weird body overflow */
   display: block;
   /* good for debugging */
-  box-shadow: 0 0 0 1px blue inset;
+  box-shadow: 0 0 0 1px red inset;
 }
