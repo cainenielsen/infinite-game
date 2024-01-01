@@ -5,7 +5,7 @@ html {
 body {
   /* remove default margin */
   margin: 0;
-  background-color: green;
+  background-color: purple;
 }
 
 canvas {
