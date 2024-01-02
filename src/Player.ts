@@ -91,7 +91,7 @@ export default class Player {
   }
   handleMovement() {
     if (this.data.movement.jump) {
-      if (this.data.location.y === -1) {
+      if (!this.falling) {
         this.data.location.y -= 0.01
         this.data.velocity.y = -0.75
       }
@@ -105,7 +105,7 @@ export default class Player {
     }
   }
   handleGravity() {
-    if (this.data.location.y < -1) {
+    if (this.data.location.y < 0) {
       if (this.data.velocity.y <= 1) {
         this.data.velocity.y += 0.05
       }
@@ -114,7 +114,7 @@ export default class Player {
     }
   }
   handleVelocity() {
-    this.data.location.y = max(this.data.location.y + this.data.velocity.y, -1)
+    this.data.location.y = max(this.data.location.y + this.data.velocity.y, 0)
 
     this.data.location.x += this.data.velocity.x
   }
@@ -146,12 +146,15 @@ export default class Player {
       y: this.visualAddress.y - this.display.canvas.height * 0.5 + this.tileSize * 0.5
     }
   }
+  get falling() {
+    return this.data.location.y < 0
+  }
   drawPlayer() {
     this.display.context.fillStyle = 'green'
 
     this.display.context.fillRect(
       this.visualAddress.x,
-      this.visualAddress.y,
+      this.visualAddress.y - this.tileSize,
       this.tileSize,
       this.tileSize
     )

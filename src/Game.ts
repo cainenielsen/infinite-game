@@ -38,7 +38,7 @@ export default class Game {
   }
   createSettingsData() {
     const newSettingsData: SettingsData = {
-      tileSize: 4,
+      tileSize: 24,
       renderDistance: 3
     }
     localStorage.setItem('game#settings', JSON.stringify(newSettingsData))
@@ -49,7 +49,8 @@ export default class Game {
   loadWorlds() {
     for (const key in localStorage) {
       if (key.startsWith('world#')) {
-        this.worlds[key] = new World(this, key)
+        const worldId = key.split('#')[1]
+        this.worlds[worldId] = new World(this, worldId)
       }
     }
   }

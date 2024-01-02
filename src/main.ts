@@ -5,7 +5,9 @@ const playerId = 'example-player-id'
 
 const game = new Game(playerId)
 
-game.createWorld()
+if (!Object.keys(game.worlds).length) {
+  game.createWorld()
+}
 
 const worldToLaunch = Object.keys(game.worlds)[0]
 

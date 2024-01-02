@@ -123,7 +123,7 @@ export default class World {
 
     if (this.chunkMedia.has(chunkAddress)) return
 
-    const rawChunkData = localStorage.getItem(`game#${this.game.id}#map#${this.id}#chunk#${chunkAddress}`)
+    const rawChunkData = localStorage.getItem(`world#${this.id}#chunk#${chunkAddress}`)
 
     if (rawChunkData) {
       const chunkData = JSON.parse(rawChunkData) as ChunkData
@@ -132,10 +132,10 @@ export default class World {
     }
 
     const newChunkData = {
-      tiles: [[]]
+      tiles: new Array(this.game.chunkSize).fill([])
     } as ChunkData
 
-    localStorage.setItem(`game#${this.game.id}#map#${this.id}#chunk#${chunkAddress}`, JSON.stringify(newChunkData))
+    localStorage.setItem(`world#${this.id}#chunk#${chunkAddress}`, JSON.stringify(newChunkData))
 
     this.loadChunkData(chunk)
   }
@@ -160,9 +160,6 @@ export default class World {
     const chunkCanvas = new OffscreenCanvas(this.chunkCanvasSize, this.chunkCanvasSize)
     const chunkContext = chunkCanvas.getContext('2d') as OffscreenCanvasRenderingContext2D
 
-    // chunkContext.fillStyle = 'yellow'
-    // chunkContext.fillRect(0, 0, this.chunkCanvasSize, this.chunkCanvasSize)
-
     if (chunk.y >= 0) {
       chunkContext.fillStyle = '#784212' // brown
     } else {
@@ -172,7 +169,8 @@ export default class World {
     chunkContext.fillRect(1, 1, this.chunkCanvasSize - 2, this.chunkCanvasSize - 2)
 
     chunkContext.fillStyle = 'black'
-    chunkContext.fillText(JSON.stringify(chunkMedia.data), this.tileSize, this.chunkCanvasSize * 0.5)
+    chunkContext.fillText(JSON.stringify(chunk), this.tileSize, this.chunkCanvasSize * 0.5)
+    chunkContext.fillText(JSON.stringify(chunkMedia.data), this.tileSize, this.chunkCanvasSize * 0.5 + this.tileSize)
 
     this.drawTilesOnChunk(chunkMedia.data.tiles)
 
