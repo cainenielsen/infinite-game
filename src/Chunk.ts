@@ -31,13 +31,11 @@ export default class Chunk {
     chunkOffsetMatrixValues[4] = this.visualAddress.x
     chunkOffsetMatrixValues[5] = this.visualAddress.y
 
-    this.context.setTransform(...chunkOffsetMatrixValues)
+    // this.context.setTransform(...defaultCanvasMatrixValues)
 
     this.loadData()
 
     this.drawChunk()
-    console.info('new chunk')
-
   }
   get chunkAddress() {
     return `${this.location.x}|${this.location.y}`

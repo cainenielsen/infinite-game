@@ -44,7 +44,7 @@ export default class World {
       Array.from(this.activeChunks.values()).forEach((chunk) => {
         this.game.display.context.fillStyle = 'black'
         this.game.display.context.fillRect(chunk.visualAddress.x, chunk.visualAddress.y, this.chunkCanvasSize, this.chunkCanvasSize)
-        this.game.display.context.drawImage(chunk.canvas, chunk.visualAddress.x, chunk.visualAddress.y, this.chunkCanvasSize, this.chunkCanvasSize, chunk.visualAddress.x, chunk.visualAddress.y, this.chunkCanvasSize, this.chunkCanvasSize)
+        this.game.display.context.drawImage(chunk.canvas, 0, 0, this.chunkCanvasSize, this.chunkCanvasSize, chunk.visualAddress.x, chunk.visualAddress.y, this.chunkCanvasSize, this.chunkCanvasSize)
       })
     })
 
