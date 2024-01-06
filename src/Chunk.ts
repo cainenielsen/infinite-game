@@ -28,20 +28,22 @@ export default class Chunk {
 
     const chunkOffsetMatrixValues = defaultCanvasMatrixValues
 
-    chunkOffsetMatrixValues[4] = this.location.x * this.chunkCanvasSize;
-    chunkOffsetMatrixValues[5] = this.location.y * this.chunkCanvasSize;
+    chunkOffsetMatrixValues[4] = this.visualAddress.x
+    chunkOffsetMatrixValues[5] = this.visualAddress.y
 
     this.context.setTransform(...chunkOffsetMatrixValues)
 
     this.loadData()
 
     this.drawChunk()
+    console.info('new chunk')
+
   }
   get chunkAddress() {
     return `${this.location.x}|${this.location.y}`
   }
   get chunkCanvasSize() {
-    return this.world.game.chunkSize * this.tileSize
+    return this.world.chunkCanvasSize
   }
   get tileSize() {
     return this.world.game.settings.tileSize
@@ -68,6 +70,7 @@ export default class Chunk {
     if (rawChunkData) this.data = JSON.parse(rawChunkData)
   }
   drawChunk() {
+    // console.info(this)
     this.clear()
     this.drawBackground()
     this.drawTiles()
