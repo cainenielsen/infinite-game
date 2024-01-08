@@ -1,14 +1,15 @@
 import Player from './Player'
 import { Point } from './helpers'
+import { ChunkData } from './Chunk'
 
 const keyMap = new Map()
 
 const jumpHandler = {
   keydown: (player: Player) => {
-    player.toggleJump(true)
+    player.movement.jump = true
   },
   keyup: (player: Player) => {
-    player.toggleJump(false)
+    player.movement.jump = false
   }
 }
 
@@ -17,10 +18,10 @@ keyMap.set('Space', jumpHandler)
 
 const leftHandler = {
   keydown: (player: Player) => {
-    player.toggleLeft(true)
+    player.movement.left = true
   },
   keyup: (player: Player) => {
-    player.toggleLeft(false)
+    player.movement.left = false
   }
 }
 
@@ -28,10 +29,10 @@ keyMap.set('KeyA', leftHandler)
 
 const rightHandler = {
   keydown: (player: Player) => {
-    player.toggleRight(true)
+    player.movement.right = true
   },
   keyup: (player: Player) => {
-    player.toggleRight(false)
+    player.movement.right = false
   }
 }
 
@@ -65,39 +66,49 @@ export default class Controller {
     }
 
     canvas.addEventListener('mousedown', (event) => {
-      const location = getCursorPosition(canvas, event)
-      this.placeTile(location)
+      const position = getCursorPosition(canvas, event)
+      this.placeTile(position)
     })
   }
-  placeTile(location: Point) {
+  placeTile(position: Point) {
     const chunk = {
-      x: Math.floor(location.x / this.player.world.game.chunkSize),
-      y: Math.floor(location.y / this.player.world.game.chunkSize)
+      x: Math.floor(position.x / this.player.world.game.chunkSize),
+      y: Math.floor(position.y / this.player.world.game.chunkSize)
     }
 
     const oldDataString = localStorage.getItem(`world#${this.player.world.id}#chunk#${chunk.x}|${chunk.y}`)
 
     if (!oldDataString) return
 
-    const oldData = JSON.parse(oldDataString)
-
-    console.info(oldData)
+    const oldData = JSON.parse(oldDataString) as ChunkData
 
     const oldTiles = oldData.tiles
 
+    if (oldTiles.find((tile) => tile.position.x === position.x && tile.position.y === position.y)) {
+      return
+    }
+
     const newTiles = oldTiles
 
-    newTiles[Math.abs(location.x)][Math.abs(location.y)] = { id: 'dirt' }
+    newTiles.push({
+      id: crypto.randomUUID(),
+      position: {
+        x: position.x,
+        y: position.y
+      },
+      size: {
+        height: 1,
+        width: 1
+      }
+    })
 
     const newData = {
       ...oldData,
       tiles: newTiles
     }
 
-    console.info('adding tile')
-
     localStorage.setItem(`world#${this.player.world.id}#chunk#${chunk.x}|${chunk.y}`, JSON.stringify(newData))
 
-    this.player.world.chunkMedia.delete(`${chunk.x}|${chunk.y}`)
+    this.player.world.activeChunks.delete(`${chunk.x}|${chunk.y}`)
   }
 }

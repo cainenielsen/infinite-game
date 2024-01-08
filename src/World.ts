@@ -1,7 +1,8 @@
-import Player from './Player'
+import Player, { PlayerInput } from './Player'
 import Game from './Game'
 import { Point } from './helpers'
 import Chunk from './Chunk'
+import { getLocalPoints } from './collision'
 
 type WorldData = {
   id: string
@@ -31,13 +32,37 @@ export default class World {
   get tileSize() {
     return this.game.settings.tileSize
   }
+  loadPlayerData(): PlayerInput {
+    const rawPlayerData = localStorage.getItem(`world#${this.id}#player#${this.game.playerId}`);
+    if (rawPlayerData) return JSON.parse(rawPlayerData)
+    const newPlayerData = {
+      createdAt: new Date().toISOString(),
+      position: {
+        x: 0,
+        y: 0
+      },
+      size: {
+        height: 1,
+        width: 1
+      },
+      velocity: {
+        x: 0,
+        y: 0
+      },
+      movement: {
+        left: false,
+        right: false,
+        jump: false
+      }
+    }
+    localStorage.setItem(`world#${this.id}#player#${this.game.playerId}`, JSON.stringify(newPlayerData))
+    return newPlayerData
+  }
   launch() {
-    this.player = new Player(this, this.game.playerId)
+    const playerData = this.loadPlayerData()
 
     this.game.animator.drawStack.push(() => {
-      if (!this.player) return
-
-      const playerContainingChunk = this.getHomePoint(this.player)
+      const playerContainingChunk = this.getHomePoint(playerData.position)
 
       this.getLocalChunks(playerContainingChunk, this.game.settings.renderDistance)
 
@@ -48,7 +73,7 @@ export default class World {
       })
     })
 
-    this.player.animate()
+    this.player = new Player(this, this.game.playerId, playerData)
   }
   setDefaultData() {
     const newWorldData: WorldData = {
@@ -64,53 +89,14 @@ export default class World {
     const rawWorldData = localStorage.getItem(`world#${this.id}`);
     if (rawWorldData) return JSON.parse(rawWorldData)
   }
-  getHomePoint(player: Player): Point {
+  getHomePoint(playerPoint: Point): Point {
     return {
-      x: Math.floor(player.data.location.x / this.game.chunkSize),
-      y: Math.floor(player.data.location.y / this.game.chunkSize)
+      x: Math.floor(playerPoint.x / this.game.chunkSize),
+      y: Math.floor(playerPoint.y / this.game.chunkSize)
     }
-  }
-  getSiblingPoints({ x, y }: Point): Point[] {
-    return [
-      { x, y: y - 1 },
-      { x, y: y + 1 },
-      { x: x - 1, y },
-      { x: x + 1, y }
-    ]
-  }
-  dedupePoints(points: Point[]): Point[] {
-    const uniquePointMap: Record<string, boolean> = {}
-    const uniquePoints = []
-    for (const point of points) {
-      const key = `${point.x}|${point.y}`;
-
-      if (!uniquePointMap[key]) {
-        uniquePointMap[key] = true;
-        uniquePoints.push(point);
-      }
-    }
-
-    return uniquePoints
-  }
-  getLocalPoints(point: Point, renderDistance: number): Point[] {
-    let localPoints = [point]
-
-    if (renderDistance > 0) {
-      const siblings = this.getSiblingPoints(point)
-
-      localPoints = [...localPoints, ...siblings]
-
-      siblings.forEach((sibling) => {
-        const relatives = this.getLocalPoints(sibling, renderDistance - 1)
-
-        localPoints = [...localPoints, ...relatives]
-      })
-    }
-
-    return this.dedupePoints(localPoints)
   }
   getLocalChunks(point: Point, renderDistance: number): void {
-    const localPoints = this.getLocalPoints(point, renderDistance)
+    const localPoints = getLocalPoints(point, renderDistance)
 
     localPoints.forEach((point) => {
       const chunkAddress = `${point.x}|${point.y}`

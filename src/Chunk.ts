@@ -1,44 +1,38 @@
-import { Point, defaultCanvasMatrixValues } from './helpers'
+import { Point, Entity } from './helpers'
 import World from './World'
 
-type TileData = {
+export interface TileData extends Entity {
   id: string
-  location: Point
 }
 
-type ChunkData = {
+export type ChunkData = {
   tiles: TileData[]
 }
 
 export default class Chunk {
   id: string
   world: World
-  location: Point
+  position: Point
   data: ChunkData | null
   canvas: OffscreenCanvas
   context: OffscreenCanvasRenderingContext2D
 
-  constructor(world: World, location: Point) {
+  constructor(world: World, position: Point) {
     this.id = crypto.randomUUID()
     this.world = world
-    this.location = location
+    this.position = position
     this.data = null
     this.canvas = new OffscreenCanvas(this.chunkCanvasSize, this.chunkCanvasSize)
     this.context = this.canvas.getContext('2d') as OffscreenCanvasRenderingContext2D
 
-    const chunkOffsetMatrixValues = defaultCanvasMatrixValues
-
-    chunkOffsetMatrixValues[4] = this.visualAddress.x
-    chunkOffsetMatrixValues[5] = this.visualAddress.y
-
-    // this.context.setTransform(...defaultCanvasMatrixValues)
+    this.context.translate(-this.visualAddress.x, -this.visualAddress.y)
 
     this.loadData()
 
     this.drawChunk()
   }
   get chunkAddress() {
-    return `${this.location.x}|${this.location.y}`
+    return `${this.position.x}|${this.position.y}`
   }
   get chunkCanvasSize() {
     return this.world.chunkCanvasSize
@@ -48,24 +42,26 @@ export default class Chunk {
   }
   get visualAddress() {
     return {
-      x: this.location.x * this.chunkCanvasSize,
-      y: this.location.y * this.chunkCanvasSize
+      x: this.position.x * this.chunkCanvasSize,
+      y: this.position.y * this.chunkCanvasSize
     }
   }
   generate() {
-    const chunkSizeArray = new Array(this.world.game.chunkSize)
-
     const newChunkData = {
-      tiles: chunkSizeArray.fill(chunkSizeArray)
+      tiles: []
     } as ChunkData
 
     localStorage.setItem(`world#${this.world.id}#chunk#${this.chunkAddress}`, JSON.stringify(newChunkData))
-
-    this.loadData()
   }
   loadData() {
     const rawChunkData = localStorage.getItem(`world#${this.world.id}#chunk#${this.chunkAddress}`)
-    if (rawChunkData) this.data = JSON.parse(rawChunkData)
+    if (rawChunkData) {
+      this.data = JSON.parse(rawChunkData)
+      return
+    }
+
+    this.generate()
+    this.loadData()
   }
   drawChunk() {
     // console.info(this)
@@ -78,26 +74,28 @@ export default class Chunk {
     this.context.clearRect(this.visualAddress.x, this.visualAddress.y, this.chunkCanvasSize, this.chunkCanvasSize)
   }
   drawBackground() {
-    if (this.location.y >= 0) {
+    if (this.position.y >= 0) {
       this.context.fillStyle = '#784212' // brown
     } else {
       this.context.fillStyle = '#85C1E9' // blue
     }
 
-    this.context.fillRect(1, 1, this.chunkCanvasSize - 2, this.chunkCanvasSize - 2)
+    this.context.fillRect(1 + this.visualAddress.x, 1 + this.visualAddress.y, this.chunkCanvasSize - 2, this.chunkCanvasSize - 2)
   }
   drawTiles() {
     if (!this.data) return
     this.data.tiles.forEach((tile) => {
       if (tile) {
+
         this.context.fillStyle = 'red'
-        this.context.fillRect(tile.location.x, tile.location.y, this.tileSize, this.tileSize)
+        this.context.fillRect(tile.position.x * this.tileSize, tile.position.y * this.tileSize, tile.size.width * this.tileSize, tile.size.height * this.tileSize)
       }
     })
   }
   drawDebugText() {
     this.context.fillStyle = 'black'
-    this.context.fillText(JSON.stringify(this.location), this.tileSize, this.chunkCanvasSize * 0.5)
-    this.context.fillText(JSON.stringify(this.data), this.tileSize, this.chunkCanvasSize * 0.5 + this.tileSize)
+    this.context.fillText(JSON.stringify(this.position), this.tileSize + this.visualAddress.x, this.chunkCanvasSize * 0.5 + this.visualAddress.y)
+    this.context.fillText(JSON.stringify(this.visualAddress), this.tileSize + this.visualAddress.x, this.chunkCanvasSize * 0.5 + this.tileSize + this.visualAddress.y)
+    this.context.fillText(JSON.stringify(this.data), this.tileSize + this.visualAddress.x, this.chunkCanvasSize * 0.5 + this.tileSize * 2 + this.visualAddress.y)
   }
 }

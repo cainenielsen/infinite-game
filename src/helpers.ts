@@ -3,16 +3,22 @@ export interface Point {
   y: number
 }
 
+export interface Dimension {
+  height: number,
+  width: number
+}
+
+export interface Entity {
+  position: Point,
+  size: Dimension
+}
+
 export const min = (val: number, minVal: number) => {
-  if (val > minVal) {
-    return val
-  } else return minVal
+  return val < minVal ? minVal : val
 }
 
 export const max = (val: number, maxVal: number) => {
-  if (val < maxVal) {
-    return val
-  } else return maxVal
+  return val > maxVal ? maxVal : val
 }
 
 export const defaultCanvasMatrixValues = [1, 0, 0, 1, 0, 0] as [number, number, number, number, number, number];
