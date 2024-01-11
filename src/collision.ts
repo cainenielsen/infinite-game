@@ -28,8 +28,8 @@ export const detectCollision = (entity1: Entity, entity2: Entity): CollisionResu
   const { position: { x: x2, y: y2 }, size: { height: height2, width: width2 } } = entity2
 
   const colliding =
-    x1 < x2 + width2 &&
-    x1 + width1 > x2 &&
+    x1 <= x2 + width2 &&
+    x1 + width1 >= x2 &&
     y1 <= y2 + height2 &&
     y1 + height1 >= y2
 

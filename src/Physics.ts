@@ -9,7 +9,7 @@ class Matter {
   constructor(physics: Physics) {
     this.physics = physics
     this.physics.character.world.game.animator.drawStack.push(() => {
-      this.detectCollisions({
+      this.character.collisions = this.detectCollisions({
         position: this.character.position,
         size: this.character.size
       })
@@ -121,7 +121,13 @@ class Gravity {
   constructor(physics: Physics) {
     this.physics = physics
     this.physics.character.world.game.animator.drawStack.push(() => {
+      const bottomCollisions = this.character.collisions.filter(({ side }) => side === 'bottom')
 
+      if (!bottomCollisions.length) {
+        if (this.character.velocity.y <= 1) {
+          this.character.velocity.y += 0.05
+        }
+      }
     })
   }
   get character() {
@@ -158,7 +164,7 @@ class Velocity {
   handleVelocity() {
     let upcomingPositionX = this.character.position.x + this.character.velocity.x
 
-    let upcomingPositionY = max(this.character.position.y + this.character.velocity.y, 0)
+    let upcomingPositionY = this.character.position.y + this.character.velocity.y
 
     const collisions = this.physics.matter.detectCollisions({
       position: {
@@ -173,11 +179,35 @@ class Velocity {
     const topCollisions = collisions.filter(({ side }) => side === 'top')
     const bottomCollisions = collisions.filter(({ side }) => side === 'bottom')
 
-    if (leftCollisions.length) upcomingPositionX = leftCollisions[0].subjects[1].position.x + 1
-    if (rightCollisions.length) upcomingPositionX = rightCollisions[0].subjects[1].position.x - 1
+    if (this.character.velocity.x > 0) {
+      if (rightCollisions.length) {
+        upcomingPositionX = Math.ceil(this.character.position.x)
+        this.character.velocity.x = 0
+      }
+    }
 
-    // if (topCollisions.length) upcomingPositionX = topCollisions[0].subjects[1].position.y + 1
-    // if (bottomCollisions.length) upcomingPositionX = bottomCollisions[0].subjects[1].position.y - 1
+    if (this.character.velocity.x < 0) {
+      if (leftCollisions.length) {
+        upcomingPositionX = Math.floor(this.character.position.x)
+        this.character.velocity.x = 0
+      }
+    }
+
+    if (this.character.velocity.y > 0) {
+      if (bottomCollisions.length) {
+        upcomingPositionY = Math.ceil(this.character.position.y)
+        this.character.velocity.y = 0
+      }
+    }
+
+    if (this.character.velocity.y < 0) {
+      if (topCollisions.length) {
+        upcomingPositionY = Math.floor(this.character.position.y)
+        this.character.velocity.y = 0
+      }
+    }
+
+
 
     this.character.position = {
       x: upcomingPositionX,

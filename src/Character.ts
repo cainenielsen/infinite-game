@@ -1,6 +1,7 @@
 import World from "./World"
 import Physics from "./Physics"
 import { min, max, Point } from "./helpers"
+import type { Collision } from "./collision"
 
 export interface CharacterInput {
   createdAt: string
@@ -43,7 +44,7 @@ export default class Character {
     right: boolean
     jump: boolean
   }
-  collisions: object[]
+  collisions: Collision[]
   world: World
   physics: Physics
 
@@ -60,14 +61,15 @@ export default class Character {
 
     this.world.game.animator.drawStack.push(() => {
       this.handleMovement()
-      this.handleGravity()
       this.handleFriction()
       this.draw()
     })
   }
   handleMovement() {
     if (this.movement.jump) {
-      if (!this.falling) {
+      const bottomCollisions = this.collisions.filter(({ side }) => side === 'bottom')
+      const topCollisions = this.collisions.filter(({ side }) => side === 'top')
+      if (bottomCollisions.length && !topCollisions.length) {
         this.position.y -= 0.01
         this.velocity.y = -0.75
       }
@@ -78,15 +80,6 @@ export default class Character {
     }
     if (!this.movement.left && this.movement.right) {
       this.velocity.x = max(this.velocity.x + 0.075, 0.5)
-    }
-  }
-  handleGravity() {
-    if (this.position.y < 0) {
-      if (this.velocity.y <= 1) {
-        this.velocity.y += 0.05
-      }
-    } else {
-      this.velocity.y = 0
     }
   }
   handleFriction() {
@@ -117,9 +110,6 @@ export default class Character {
       x: this.position.x * this.world.tileSize,
       y: this.position.y * this.world.tileSize
     }
-  }
-  get falling() {
-    return this.position.y < 0
   }
   get display() {
     return this.world.game.display
